@@ -43,8 +43,8 @@ public class Player {
 
     private void setPosition() {
         Property prop = properties.get(index);
-        this.x = prop.getX() + Define.SMALL_TILE_SIZE_X / 2 - Define.PlayerRadius / 2;
-        this.y = prop.getY() + Define.SMALL_TILE_SIZE_Y / 2 - Define.PlayerRadius / 2;
+        this.x = prop.getX() + Define.SMALL_TILE_SIZE_X / 2 ;
+        this.y = prop.getY() + Define.SMALL_TILE_SIZE_Y / 2 ;
     }
 
     public boolean isBankrupt() {

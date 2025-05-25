@@ -3,6 +3,7 @@ package main;
 import javax.swing.JFrame;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 import Define.*;
 import Property.Property;
@@ -28,7 +29,8 @@ public class Main {
 
 
         // Tạo MainBoard và thêm vào frame
-        MainBoard board = new MainBoard(Property.createProperties());
+        List<Property> properties=Property.createProperties();
+        MainBoard board = new MainBoard(properties,new Player("An", 1, Color.RED,properties , 1));
         frame.add(board);
 
         frame.setLocationRelativeTo(null); 

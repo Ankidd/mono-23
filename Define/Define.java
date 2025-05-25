@@ -7,7 +7,7 @@ public class Define {
     public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     public static final int WIDTH = screenSize.width;
     public static final int HEIGHT = screenSize.height;
-    public static final int PlayerRadius=30;
+    public static final int PlayerRadius=15;
 
     public static final int BIG_TILE_SIZE = 150;
     public static final int NUM_VERTICAL_TILES_UP = 7;

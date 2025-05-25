@@ -14,12 +14,14 @@ import player.Player;
 public class MainBoard extends JPanel {
 
     private List<Property> properties;
+    private Player player;
     // private List<Player> players;
     // private BufferedImage houseImage;
     // private BufferedImage festivalImage;
 
-    public MainBoard(List<Property> properties) {
+    public MainBoard(List<Property> properties,Player player) {
         this.properties = properties;
+        this.player=player;
         // this.players = players;
         // loadImages();
          this.setBackground(Color.WHITE);
@@ -86,6 +88,9 @@ public class MainBoard extends JPanel {
             //     g.setFont(new Font("Arial", Font.BOLD, 20));
             //     g.drawString("$" + prop.getRent(), rentPosition.x, rentPosition.y);
             // }
+        }
+        if(player!=null){
+            player.DrawPlayer(g);
         }
     }
 }
