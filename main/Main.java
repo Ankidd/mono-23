@@ -2,14 +2,17 @@ package main;
 
 import javax.swing.JFrame;
 import java.awt.*;
-import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import Define.*;
 import Property.Property;
+import manager.GameManager;
 import player.Player;
 
-public class Main {
+
+
+public class Main{
     public static void main(String[] args) {
         System.out.println(Define.WIDTH+" "+Define.HEIGHT);
         JFrame frame = new JFrame("Monopoly Board");
@@ -18,20 +21,16 @@ public class Main {
         
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         gd.setFullScreenWindow(frame);
-        frame.addKeyListener(new KeyAdapter() {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                System.exit(0);  
-            }
-        }
-        });
+        List<Property> properties = Property.createProperties();
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("An", 1, Color.RED, properties, 0));
+        GameManager gameManager = new GameManager(players, properties);
 
-
-        // Tạo MainBoard và thêm vào frame
-        List<Property> properties=Property.createProperties();
-        MainBoard board = new MainBoard(properties,new Player("An", 1, Color.RED,properties , 1));
+        
+        MainBoard board = new MainBoard(properties, players, gameManager);
         frame.add(board);
+
+
 
         frame.setLocationRelativeTo(null); 
         frame.setVisible(true);

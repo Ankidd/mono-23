@@ -112,6 +112,7 @@
         public static List<Property> createProperties() {
             List<Property> properties = new ArrayList<>();
 
+            properties.add(new Property(0, 0, Define.HEIGHT-Define.BIG_TILE_SIZE, null, 0, "START"));
             // left
             properties.add(new Property(1,18,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X-12), Define.PASTEL_PINK, 5000, "Seoul"));
             properties.add(new Property(2,18,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*2-12), Define.PASTEL_PINK, 5000, "Busan"));
@@ -120,6 +121,7 @@
             properties.add(new Property(5,18,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*5-12), Define.PASTEL_ORANGE, 5000, "Ho Chi Minh City"));
             properties.add(new Property(6,18,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*6-12), Define.PASTEL_ORANGE, 5000, "Bangkok"));
 
+            properties.add(new Property(7, 0,0, null, 0, "PRISON"));
             // top
             properties.add(new Property(8,Define.BIG_TILE_SIZE,0, Define.PASTEL_YELLOW, 5000, "Dubai"));
             properties.add(new Property(9,Define.BIG_TILE_SIZE+Define.SMALL_TILE_SIZE_X,0, Define.PASTEL_YELLOW, 5000, "Sydney"));
@@ -135,6 +137,7 @@
             properties.add(new Property(19,Define.BIG_TILE_SIZE+Define.SMALL_TILE_SIZE_X*11,0, Define.PASTEL_BLUE, 5000, "Tokyo"));
             properties.add(new Property(20,Define.BIG_TILE_SIZE+Define.SMALL_TILE_SIZE_X*12,0, Define.PASTEL_BLUE, 5000, "Granada"));
 
+            properties.add(new Property(21, Define.WIDTH-Define.BIG_TILE_SIZE, 0, null, 0, "PARK"));
             // right
             properties.add(new Property(22,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X-12),Define.PALE_AQUA, 5000, "Madrid"));
             properties.add(new Property(23,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*2-12), Define.PALE_AQUA, 5000, "Bali Beach"));
@@ -143,6 +146,7 @@
             properties.add(new Property(26,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*5-12), Define.PASTEL_PURPLE, 5000, "Bandung"));
             properties.add(new Property(27,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*6-12), Define.LIGHT_CORAL, 5000, "Jakarta"));
 
+            properties.add(new Property(28, Define.WIDTH-Define.BIG_TILE_SIZE, Define.HEIGHT-Define.BIG_TILE_SIZE, null, 0, "VISIT"));
             // bottom
             properties.add(new Property(29,Define.WIDTH-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X,Define.HEIGHT-Define.SMALL_TILE_SIZE_Y, Define.LIGHT_CORAL, 5000, "Delhi"));
             properties.add(new Property(30,Define.WIDTH-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*2,Define.HEIGHT-Define.SMALL_TILE_SIZE_Y, Define.LIGHT_PERIWINKLE, 5000, "Mumbai"));

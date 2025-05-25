@@ -1,40 +1,74 @@
 package main;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxUI.KeyHandler;
+
 import java.awt.*;
 import java.util.List;
+import java.awt.event.*;
 
 
 import Property.Property;
 import Tile_base.*;
 import Define.*;
 import player.Player;
+import manager.GameManager;
 
-
-public class MainBoard extends JPanel {
+public class MainBoard extends JPanel implements Runnable{
 
     private List<Property> properties;
-    private Player player;
-    // private List<Player> players;
-    // private BufferedImage houseImage;
-    // private BufferedImage festivalImage;
+    private GameManager gameManager;
+    private List<Player> players;
+    private Timer gameTimer;
+    public Thread gameThread;
+    private keyHandler KeyH=new keyHandler();
 
-    public MainBoard(List<Property> properties,Player player) {
+
+    public MainBoard(List<Property> properties,List<Player> players,GameManager gameManager) {
         this.properties = properties;
-        this.player=player;
-        // this.players = players;
-        // loadImages();
-         this.setBackground(Color.WHITE);
+        this.players=players;
+        this.gameManager=gameManager;
+        this.setBackground(Color.WHITE);
+        this.addKeyListener(KeyH);
+        this.setFocusable(true);
+        this.requestFocusInWindow();
+
+         gameTimer = new Timer(16, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameUpdate();
+                repaint();
+            }
+        });
+        gameTimer.start();
     }
 
-    // private void loadImages() {
-    //     try {
-    //         houseImage = ImageIO.read(getClass().getResource("/images/house.png"));
-    //         festivalImage = ImageIO.read(getClass().getResource("/images/festival.png"));
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+    public void StartGameThread(){
+        gameThread= new Thread(this);
+        gameThread.start();
+    }
+    @Override
+    public void run(){
+        while (gameThread!=null){
+
+            gameUpdate();
+
+            repaint();
+        }
+    }
+
+    public void gameUpdate() {
+        Dice dice=new Dice();
+        if(KeyH.roll_button){
+            dice.roll();
+            gameManager.movePlayer(dice.getTotal());
+            KeyH.roll_button=false;
+        }
+        if(KeyH.exit){
+            System.exit(0);
+        }
+
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -44,7 +78,7 @@ public class MainBoard extends JPanel {
 
     private void drawBoard(Graphics2D g) {
         for (Property prop : properties) {
-            Small_Tile SmallTile= new Small_Tile(prop.getColor(),prop.getX(),prop.getY(),prop.getName(),prop.getValue());
+            Small_Tile SmallTile= new Small_Tile(prop.getColor(),prop.getX(),prop.getY(),prop.getName(),prop.getValue(),null);
             if(prop.getId()>=1 && prop.getId()<=6){
                 SmallTile.drawLeftTile(g);
             }
@@ -58,18 +92,22 @@ public class MainBoard extends JPanel {
             else if(prop.getId()>=29 && prop.getId()<=41){
                 SmallTile.drawDownTile(g);
             }
-
-            Big_Tile Start=new Big_Tile(0, 0,"START",null);
-            Start.drawBigTile(g,Define.BIG_TILE_SIZE , Define.BIG_TILE_SIZE, 135);
-
-            Big_Tile prison=new Big_Tile(Define.WIDTH-Define.BIG_TILE_SIZE, 0,"PRISON",null);
-            prison.drawBigTile(g,Define.BIG_TILE_SIZE , Define.BIG_TILE_SIZE, 135);
-
-            Big_Tile park=new Big_Tile(Define.WIDTH-Define.BIG_TILE_SIZE, Define.HEIGHT-Define.BIG_TILE_SIZE,"PARK",null);
-            park.drawBigTile(g,Define.BIG_TILE_SIZE , Define.BIG_TILE_SIZE, 135);
-            
-            Big_Tile visit=new Big_Tile(0, Define.HEIGHT-Define.BIG_TILE_SIZE,"VISIT",null);
-            visit.drawBigTile(g,Define.BIG_TILE_SIZE , Define.BIG_TILE_SIZE, 135);
+            else if(prop.getId()==0){
+                Big_Tile start=new Big_Tile(prop.getX(), prop.getY(), prop.getName(),null);
+                start.drawBigTile(g, Define.BIG_TILE_SIZE, Define.BIG_TILE_SIZE, 0);
+            }
+            else if(prop.getId()==7){
+                Big_Tile prison=new Big_Tile(prop.getX(), prop.getY(), prop.getName(),null);
+                prison.drawBigTile(g, Define.BIG_TILE_SIZE, Define.BIG_TILE_SIZE, 0);
+            }
+            else if(prop.getId()==21){
+                Big_Tile park=new Big_Tile(prop.getX(), prop.getY(), prop.getName(),null);
+                park.drawBigTile(g, Define.BIG_TILE_SIZE, Define.BIG_TILE_SIZE, 0);
+            }
+            else if(prop.getId()==28){
+                Big_Tile visit=new Big_Tile(prop.getX(), prop.getY(), prop.getName(),null);
+                visit.drawBigTile(g, Define.BIG_TILE_SIZE, Define.BIG_TILE_SIZE, 0);
+            }
 
             for (int i = 0; i < prop.getLevel(); i++) {
                 g.drawImage(image.houseImg, prop.getX()+5+i*18, prop.getY()+5, null);
@@ -89,9 +127,11 @@ public class MainBoard extends JPanel {
             //     g.drawString("$" + prop.getRent(), rentPosition.x, rentPosition.y);
             // }
         }
-        if(player!=null){
-            player.DrawPlayer(g);
+        if(players!=null){
+            for(Player player:players){
+            player.DrawPlayer(g);}
         }
     }
+
 }
 
