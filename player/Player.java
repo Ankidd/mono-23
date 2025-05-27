@@ -2,10 +2,17 @@ package player;
 
 import java.awt.*;
 import java.util.List;
+import javax.swing.Timer;
 import java.util.ArrayList;
+import java.awt.event.*;
 
+
+import manager.UIManager;
 import Define.Define;
+import Define.GameState;
 import Property.Property;
+import main.MainBoard;
+import main.GamePanel;
 
 public class Player {
     private int index;
@@ -18,6 +25,7 @@ public class Player {
     private int jailTurnsLeft;
     private boolean canRollAfterJail;
     private boolean bankruptcyStatus;
+    private boolean is_moving;
 
     private Color color;
     private int x, y;
@@ -39,6 +47,7 @@ public class Player {
         this.ownedProperties = new ArrayList<>();
         this.properties = properties;
         setPosition();
+        this.is_moving=false;
     }
 
     private void setPosition() {
@@ -108,13 +117,32 @@ public class Player {
         setPosition();
     }
 
-    public void move(int steps) {
-        for (int i = 0; i < steps; i++) {
-            this.index = (this.index + 1) % properties.size();
-            setPosition();
-            // You would update UI or animation here in actual game loop
-        }
+
+    public void move(int steps, MainBoard mainBoard, UIManager uiManager,GamePanel gamePanel) {
+        if(is_moving){return;}
+        is_moving=true;
+        final int[] currentStep = {0};
+        Timer moveTimer = new Timer(200, null);
+
+        moveTimer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (currentStep[0] < steps) {
+                    index = (index + 1) % properties.size();
+                    setPosition();    // Cập nhật tọa độ mới
+                    mainBoard.repaint(); // Vẽ lại bảng
+                    currentStep[0]++;
+                } else {
+                    ((Timer)e.getSource()).stop(); 
+                    gamePanel.setGameState(GameState.WAITING_FOR_PROPERTY_ACTION);
+                    is_moving=false;
+                }
+            }
+        });
+
+        moveTimer.start();
     }
+
 
     public void DrawPlayer(Graphics2D g2){
         int radius=Define.PlayerRadius;

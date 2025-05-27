@@ -6,7 +6,9 @@ import java.util.List;
 import javax.swing.*;
 
 import Property.Property;
+import main.MainBoard;
 import player.Player;
+import Define.ActionMenuPanel;
 import Define.Define;
 
 public class UIManager {
@@ -35,63 +37,117 @@ public class UIManager {
     private boolean sellMode = false;
     private Player sellPlayer = null;
     private int sellTargetMoney = 0;
-    private List<SellButton> sellButtons = new ArrayList<>();
+    private List<SellButton> sellButtons = new ArrayList<>();   
+    private JFrame frame;
 
-    public UIManager(JPanel panel, Image image, Rectangle imageRect, List<Property> properties, List<Player> players, GameManager gameManager) {
+    public UIManager(JPanel panel, Image image, Rectangle imageRect, List<Property> properties, List<Player> players,JFrame frame) {
         this.panel = panel;
         this.backgroundImage = image;
         this.imageRect = imageRect;
         this.properties = properties;
         this.players = players;
-        this.gameManager = gameManager;
+        // this.gameManager = gameManager;
+        this.showMenu=false;
         this.startTime = System.currentTimeMillis();
+        this.frame=frame;
     }
 
-    public void showSellMenu(Graphics g, Player player) {
-        sellButtons.clear();
-        Font font = new Font("Arial", Font.PLAIN, 18);
-        g.setFont(font);
+    // public void showSellMenu(Graphics g, Player player) {
+    //     sellButtons.clear();
+    //     Font font = new Font("Arial", Font.PLAIN, 18);
+    //     g.setFont(font);
 
-        String title = player.getName() + ", choose a property to sell";
-        List<String> wrappedTitle = wrapText(title, font, 290, g);
+    //     String title = player.getName() + ", choose a property to sell";
+    //     List<String> wrappedTitle = wrapText(title, font, 290, g);
 
-        int titleHeight = wrappedTitle.size() * 45;
-        int numProps = player.getOwnedProperties().size();
-        int menuHeight = 50 + titleHeight + numProps * 60 + 60;
-        Rectangle menuBg = new Rectangle(Define.WIDTH / 2 - 200, Define.HEIGHT / 2 - menuHeight / 2, 400, menuHeight);
+    //     int titleHeight = wrappedTitle.size() * 45;
+    //     int numProps = player.getOwnedProperties().size();
+    //     int menuHeight = 50 + titleHeight + numProps * 60 + 60;
+    //     Rectangle menuBg = new Rectangle(Define.WIDTH / 2 - 200, Define.HEIGHT / 2 - menuHeight / 2, 400, menuHeight);
 
-        g.setColor(Color.GREEN);
-        g.fillRoundRect(menuBg.x, menuBg.y, menuBg.width, menuBg.height, 10, 10);
-        g.setColor(Color.BLACK);
-        g.drawRoundRect(menuBg.x, menuBg.y, menuBg.width, menuBg.height, 10, 10);
+    //     g.setColor(Color.GREEN);
+    //     g.fillRoundRect(menuBg.x, menuBg.y, menuBg.width, menuBg.height, 10, 10);
+    //     g.setColor(Color.BLACK);
+    //     g.drawRoundRect(menuBg.x, menuBg.y, menuBg.width, menuBg.height, 10, 10);
 
-        for (int i = 0; i < wrappedTitle.size(); i++) {
-            g.drawString(wrappedTitle.get(i), menuBg.x + 20, menuBg.y + 20 + i * 45);
+    //     for (int i = 0; i < wrappedTitle.size(); i++) {
+    //         g.drawString(wrappedTitle.get(i), menuBg.x + 20, menuBg.y + 20 + i * 45);
+    //     }
+
+    //     int startY = menuBg.y + 30 + titleHeight;
+    //     for (Property prop : player.getOwnedProperties()) {
+    //         Rectangle propRect = new Rectangle(menuBg.x + 20, startY, 360, 45);
+    //         g.setColor(Color.WHITE);
+    //         g.fillRoundRect(propRect.x, propRect.y, propRect.width, propRect.height, 6, 6);
+    //         g.setColor(Color.BLACK);
+    //         g.drawRoundRect(propRect.x, propRect.y, propRect.width, propRect.height, 6, 6);
+
+    //         String name = prop.getName() + " - Sell for $" + (prop.getValue() / 2);
+    //         g.drawString(name, propRect.x + 10, propRect.y + 30);
+
+    //         sellButtons.add(new SellButton(propRect, prop));
+    //         startY += 60;
+    //     }
+
+        
+
+    //     Rectangle doneRect = new Rectangle(menuBg.x + menuBg.width / 2 - 60, menuBg.y + menuHeight - 55, 120, 40);
+    //     g.setColor(Color.GREEN);
+    //     g.fillRoundRect(doneRect.x, doneRect.y, doneRect.width, doneRect.height, 8, 8);
+    //     g.setColor(Color.BLACK);
+    //     g.drawRoundRect(doneRect.x, doneRect.y, doneRect.width, doneRect.height, 8, 8);
+    //     g.drawString("DONE", doneRect.x + 30, doneRect.y + 28);
+    //     sellButtons.add(new SellButton(doneRect, "DONE"));
+    // }
+
+
+    public void drawBuyPropertyMenu(Player player, Property property) {
+        int choice = JOptionPane.showConfirmDialog(
+            frame,
+            "Do you want to buy " + property.getName() + " for $" + property.getValue() + "?",
+            "Buy Property",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            player.chargeMoney(property.getValue());
+            player.addProperty(property);
+            JOptionPane.showMessageDialog(frame, "You bought " + property.getName() + "!");
+        } else {
+            JOptionPane.showMessageDialog(frame, "You chose not to buy " + property.getName() + ".");
         }
 
-        int startY = menuBg.y + 30 + titleHeight;
-        for (Property prop : player.getOwnedProperties()) {
-            Rectangle propRect = new Rectangle(menuBg.x + 20, startY, 360, 45);
-            g.setColor(Color.WHITE);
-            g.fillRoundRect(propRect.x, propRect.y, propRect.width, propRect.height, 6, 6);
-            g.setColor(Color.BLACK);
-            g.drawRoundRect(propRect.x, propRect.y, propRect.width, propRect.height, 6, 6);
-
-            String name = prop.getName() + " - Sell for $" + (prop.getValue() / 2);
-            g.drawString(name, propRect.x + 10, propRect.y + 30);
-
-            sellButtons.add(new SellButton(propRect, prop));
-            startY += 60;
-        }
-
-        Rectangle doneRect = new Rectangle(menuBg.x + menuBg.width / 2 - 60, menuBg.y + menuHeight - 55, 120, 40);
-        g.setColor(Color.GREEN);
-        g.fillRoundRect(doneRect.x, doneRect.y, doneRect.width, doneRect.height, 8, 8);
-        g.setColor(Color.BLACK);
-        g.drawRoundRect(doneRect.x, doneRect.y, doneRect.width, doneRect.height, 8, 8);
-        g.drawString("DONE", doneRect.x + 30, doneRect.y + 28);
-        sellButtons.add(new SellButton(doneRect, "DONE"));
     }
+
+    public void drawUpgradeMenu(Player player, Property property) {
+    if (property.getLevel() >= 5) {
+        JOptionPane.showMessageDialog(frame, "You have reached the maximum level.");
+        return;
+    }
+
+    String title = "Upgrade " + property.getName();
+    String desc = "Level " + property.getLevel() + " → " + (property.getLevel() + 1)
+                + " | Cost: $" + property.getUpgradeCost();
+
+    ActionMenuPanel panel = new ActionMenuPanel(
+        frame,
+        title,
+        desc,
+        "Upgrade",
+        e -> {
+            if (player.getMoney() >= property.getUpgradeCost()) {
+                player.chargeMoney(property.getUpgradeCost());
+                property.setLevel(property.getLevel() + 1);
+                JOptionPane.showMessageDialog(frame, "Upgraded to level " + property.getLevel());
+            } else {
+                JOptionPane.showMessageDialog(frame, "Not enough money to upgrade.");
+            }
+        }
+    );
+
+    panel.showDialog(frame, "Upgrade Property");
+}
+
 
     public void drawCountdownTimer(Graphics g) {
         long currentTime = System.currentTimeMillis();

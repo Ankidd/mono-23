@@ -16,6 +16,7 @@
         private int x,y;
         private int level;
         private boolean festival;
+        private int rent;
 
         // Constructor
         public Property(int id,int x,int y,Color color, int value, String name) {
@@ -29,6 +30,7 @@
             this.owner = null;
             this.level=0;
             this.festival=false;
+            rent=(int)(value * 0.06);
         }
 
         // Getters
@@ -59,9 +61,13 @@
         public int getLevel(){
             return this.level;
         }
+        public void setLevel(int level){
+            this.level=level;
+        }
 
-        public double getUpgradeCost(){
-            return (this.value*0.6);
+
+        public int getUpgradeCost(){
+            return (int)(this.value*0.6);
         }
 
         public boolean hasFestival(){
@@ -108,6 +114,9 @@
             }
             return false;
         }
+        public int getRent(){
+            return this.rent;
+        }
 
         public static List<Property> createProperties() {
             List<Property> properties = new ArrayList<>();
@@ -139,12 +148,12 @@
 
             properties.add(new Property(21, Define.WIDTH-Define.BIG_TILE_SIZE, 0, null, 0, "PARK"));
             // right
-            properties.add(new Property(22,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X-12),Define.PALE_AQUA, 5000, "Madrid"));
-            properties.add(new Property(23,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*2-12), Define.PALE_AQUA, 5000, "Bali Beach"));
-            properties.add(new Property(24,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*3-12), Define.PASTEL_PURPLE, 5000, "HongKong"));
-            properties.add(new Property(25,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*4-12), Define.PASTEL_PURPLE, 5000, "Beijing"));
-            properties.add(new Property(26,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*5-12), Define.PASTEL_PURPLE, 5000, "Bandung"));
-            properties.add(new Property(27,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*6-12), Define.LIGHT_CORAL, 5000, "Jakarta"));
+            properties.add(new Property(22,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*6-12),Define.PALE_AQUA, 5000, "Madrid"));
+            properties.add(new Property(23,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*5-12), Define.PALE_AQUA, 5000, "Bali Beach"));
+            properties.add(new Property(24,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*4-12), Define.PASTEL_PURPLE, 5000, "HongKong"));
+            properties.add(new Property(25,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*3-12), Define.PASTEL_PURPLE, 5000, "Beijing"));
+            properties.add(new Property(26,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*2-12), Define.PASTEL_PURPLE, 5000, "Bandung"));
+            properties.add(new Property(27,Define.WIDTH-Define.SMALL_TILE_SIZE_Y+20,(Define.HEIGHT-Define.BIG_TILE_SIZE-Define.SMALL_TILE_SIZE_X*1-12), Define.LIGHT_CORAL, 5000, "Jakarta"));
 
             properties.add(new Property(28, Define.WIDTH-Define.BIG_TILE_SIZE, Define.HEIGHT-Define.BIG_TILE_SIZE, null, 0, "VISIT"));
             // bottom

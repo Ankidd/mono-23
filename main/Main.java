@@ -1,6 +1,8 @@
 package main;
 
 import javax.swing.JFrame;
+
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,7 @@ import Define.*;
 import Property.Property;
 import manager.GameManager;
 import player.Player;
+import manager.UIManager;
 
 
 
@@ -24,15 +27,18 @@ public class Main{
         List<Property> properties = Property.createProperties();
         List<Player> players = new ArrayList<>();
         players.add(new Player("An", 1, Color.RED, properties, 0));
-        GameManager gameManager = new GameManager(players, properties);
+        MainBoard board = new MainBoard(properties, players);
+
+        UIManager uiManager=new UIManager(null,null,null,properties,players,frame);
+        GameManager gameManager = new GameManager(players, properties,uiManager,board);
 
         
-        MainBoard board = new MainBoard(properties, players, gameManager);
-        frame.add(board);
-
-
-
-        frame.setLocationRelativeTo(null); 
+        GamePanel gamePanel = new GamePanel(properties, players, gameManager, uiManager);
+       
+        frame.add(gamePanel);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+        gamePanel.startGameThread(); 
     }
 }

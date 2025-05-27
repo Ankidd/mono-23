@@ -3,20 +3,29 @@ import java.util.*;
 import player.Player;
 import Property.Property;
 import Define.Dice;
+import main.GamePanel;
+import main.Main;
+import main.MainBoard;
+import manager.UIManager;
 
 public class GameManager {
     private List<Player> players;
-    private List<Property> tiles;
+    private List<Property> properties;
     private int currentPlayerIndex;
     private int turnCounter;
     private String activeEvent;
+    private UIManager uiManager;
+    private MainBoard mainBoard;
 
-    public GameManager(List<Player> players, List<Property> properties) {
+
+    public GameManager(List<Player> players, List<Property> properties,UIManager uiManager,MainBoard mainBoard) {
         this.players = players;
-        this.tiles = properties;
+        this.properties = properties;
         this.currentPlayerIndex = 0;
         this.turnCounter = 0;
         this.activeEvent = null;
+        this.uiManager=uiManager;
+        this.mainBoard=mainBoard;
     }
 
     public Player getCurrentPlayer() {
@@ -103,18 +112,49 @@ public class GameManager {
     //     }
     // }
 
-    // public Property movePlayer(int steps) {
-    //     Player player = getCurrentPlayer();
-    //     player.setIndex((player.getIndex() + steps) % tiles.size());
-    //     return tiles.get(player.getIndex());
-    // }
 
-    public void movePlayer(int steps){
-        Player player = getCurrentPlayer();
-        player.move(steps);
-        // player.setIndex(player.getIndex()+steps);
-    }
+        public void movePlayer(int steps,MainBoard mainBoard,UIManager uiManager,GamePanel gamePanel){
+            Player player = getCurrentPlayer();
+            player.move(steps,mainBoard,uiManager,gamePanel);
+            // player.setIndex(player.getIndex()+steps);
+        }
 
+        public void buyProperty(Property landedProperty,Player player){
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                uiManager.drawBuyPropertyMenu(player, landedProperty);
+            });
+        }
+
+        public void payRent(Property landedProperty,Player player){
+            if(!landedProperty.getOwner().getName().equals(player.getName())){
+                Player owner=landedProperty.getOwner();
+                player.payPlayer(owner, landedProperty.getRent());
+            }
+        }
+
+        public void processCurrentProperty() {
+            Player player = getCurrentPlayer();
+            int index = player.getIndex();
+            Property landedProperty = this.properties.get(index);
+
+            if (!landedProperty.isOwned()) {
+                buyProperty(landedProperty, player);
+            } else if (!landedProperty.getOwner().getName().equals(player.getName())) {
+                // Nếu có chủ khác -> trả tiền thuê
+                payRent(landedProperty,player);
+            }
+        }
+
+
+        public void processUpgradeProperty(){
+            Player player = getCurrentPlayer();
+            int index = player.getIndex();  
+            Property landedProperty = this.properties.get(index);
+
+            if(landedProperty.isOwned()&&landedProperty.getOwner().getName().equals(player.getName())){
+                uiManager.drawUpgradeMenu(player,landedProperty);
+            }
+        } 
     // public boolean upgradeProperty(Property property, Player player, UIManager uiManager) {
     //     if (!property.getOwner().equals(player)) {
     //         uiManager.pauseAndShowMessage("Can not upgrade property not owned by you!", 1500);
