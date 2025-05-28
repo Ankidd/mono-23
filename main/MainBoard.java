@@ -38,7 +38,7 @@ public class MainBoard extends JPanel {
             } else if (prop.getId() >= 29 && prop.getId() <= 41) {
                 SmallTile.drawDownTile(g);
             } else {
-                Big_Tile bigTile = new Big_Tile(prop.getX(), prop.getY(), prop.getName(), null);
+                Big_Tile bigTile = new Big_Tile(prop.getX(), prop.getY(), prop.getName(), image.festivalImg);
                 bigTile.drawBigTile(g, Define.BIG_TILE_SIZE, Define.BIG_TILE_SIZE, 0);
             }
 

@@ -203,27 +203,27 @@ public class GameManager {
 
         public void prisonProcess(){
             Player player = getCurrentPlayer();
-    Dice dice = new Dice();
-    dice.roll();
-    JOptionPane.showMessageDialog(null, player.getName() + " rolled " + dice.getDie1() + " and " + dice.getDie2());
+            Dice dice = new Dice();
+            dice.roll();
+            JOptionPane.showMessageDialog(null, player.getName() + " rolled " + dice.getDie1() + " and " + dice.getDie2());
 
-    if (dice.isDouble()) {
-        player.setJailStatus(false);
-        player.setJailTurnLeft(0);
-        JOptionPane.showMessageDialog(null, player.getName() + " rolled a double and is free!");
-    } else {
-        // Vẫn bị tù
-        int turnsLeft = player.getJailTurnLeft() - 1;
-        player.setJailTurnLeft(turnsLeft);
-        JOptionPane.showMessageDialog(null, player.getName() + " stays in jail. Turns left: " + turnsLeft);
+            if (dice.isDouble()) {
+                player.setJailStatus(false);
+                player.setJailTurnLeft(0);
+                JOptionPane.showMessageDialog(null, player.getName() + " rolled a double and is free!");
+            } else {
+                // Vẫn bị tù
+                int turnsLeft = player.getJailTurnLeft() - 1;
+                player.setJailTurnLeft(turnsLeft);
+                JOptionPane.showMessageDialog(null, player.getName() + " stays in jail. Turns left: " + turnsLeft);
 
-        if (turnsLeft <= 0) {
-            // Hết lượt, trả tiền để ra
-            player.chargeMoney(500);
-            player.setJailStatus(false);
-            JOptionPane.showMessageDialog(null, player.getName() + " paid $500 and is free!");
-        }
-    }
+                if (turnsLeft <= 0) {
+                    // Hết lượt, trả tiền để ra
+                    player.chargeMoney(500);
+                    player.setJailStatus(false);
+                    JOptionPane.showMessageDialog(null, player.getName() + " paid $500 and is free!");
+                }
+            }
         }
  
 

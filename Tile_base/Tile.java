@@ -66,7 +66,7 @@ abstract class Tile {
 }   
 
    private void drawText(Graphics2D g2, int width, int height) {
-    Font font = new Font("Arial", Font.PLAIN, 12);
+    Font font = new Font("Arial", Font.BOLD, 12);
     g2.setFont(font);
     FontMetrics metrics = g2.getFontMetrics();
 

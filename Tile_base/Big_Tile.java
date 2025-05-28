@@ -8,54 +8,76 @@ public class Big_Tile extends Tile{
         super(null, x, y, name, 0, img);
     }
 
-    public void drawBigTile(Graphics2D g, int width, int height, double rotation) {
-        BufferedImage tileSurface = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = tileSurface.createGraphics();
+     public void drawBigTile(Graphics2D g, int width, int height, double rotation) {
+        BufferedImage tileImage = renderTileImage(width, height);
+        drawRotated(g, tileImage, width, height, rotation);
+    }
 
+    // Tạo hình ảnh của ô tile
+    private BufferedImage renderTileImage(int width, int height) {
+        BufferedImage tileSurface = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = tileSurface.createGraphics();;
+
+
+        drawBackground(g2, width, height);
+        drawImage(g2, width,height);
+        drawText(g2, width, height);
+
+        g2.dispose();
+        return tileSurface;
+    }
+
+    private void drawBackground(Graphics2D g2, int width, int height) {
         g2.setColor(Define.WHITE);
         g2.fillRect(0, 0, width, height);
         g2.setColor(Define.BLACK);
         g2.drawRect(0, 0, width - 1, height - 1);
+    }
 
-        // Content rendering
-        BufferedImage content = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gc = content.createGraphics();
-        gc.setFont(new Font("Arial", Font.PLAIN, 16));
-        FontMetrics metrics = gc.getFontMetrics();
 
-        String[] words = name.split(" ");
-        StringBuilder line = new StringBuilder();
-        int yOffset = 30;
+    private void drawImage(Graphics2D g2, int width, int height) {
+    if (img != null) {
+        int imgSize = 90;
+        int imgX = width/2 -imgSize/2;
+        int imgY = (height/ 2) - imgSize / 2; 
+        g2.drawImage(img.getScaledInstance(imgSize, imgSize, Image.SCALE_SMOOTH), imgX, imgY, null);
+    }
+}   
 
-        for (String word : words) {
-            String testLine = line.length() == 0 ? word : line + " " + word;
-            if (metrics.stringWidth(testLine) <= width) {
-                line = new StringBuilder(testLine);
-            } else {
-                gc.drawString(line.toString(), (width - metrics.stringWidth(line.toString())) / 2, yOffset);
-                yOffset += metrics.getHeight();
-                line = new StringBuilder(word);
-            }
+   private void drawText(Graphics2D g2, int width, int height) {
+    Font font = new Font("Arial", Font.BOLD, 20);
+    g2.setFont(font);
+    FontMetrics metrics = g2.getFontMetrics();
+
+    String[] words = name.split(" ");
+    StringBuilder line = new StringBuilder();
+    int yOffset = height - 20; // Khoảng cách cách đáy một chút
+
+    for (String word : words) {
+        String testLine = line.length() == 0 ? word : line + " " + word;
+        if (metrics.stringWidth(testLine) <= width - 8) {
+            line = new StringBuilder(testLine);
+        } else {
+            g2.drawString(line.toString(), (width - metrics.stringWidth(line.toString())) / 2, yOffset);
+            yOffset += metrics.getHeight();
+            line = new StringBuilder(word);
         }
-        gc.drawString(line.toString(), (width - metrics.stringWidth(line.toString())) / 2, yOffset);
+    }
 
-        // Draw image
-        if (img != null) {
-            Image newImg = img.getScaledInstance(90, 90, Image.SCALE_SMOOTH);
-            gc.drawImage(newImg, (width - 70) / 2, yOffset + 5, null);
+    if (line.length() > 0) {
+        g2.drawString(line.toString(), (width - metrics.stringWidth(line.toString())) / 2, yOffset);
+    }
+    }
+
+    private void drawRotated(Graphics2D g, BufferedImage image, int width, int height, double rotation) {
+        if (rotation != 0) {
+            AffineTransform transform = new AffineTransform();
+            transform.translate(x + width / 2.0, y + height / 2.0);
+            transform.rotate(Math.toRadians(rotation));
+            transform.translate(-width / 2.0, -height / 2.0);
+            g.drawImage(image, transform, null);
+        } else {
+            g.drawImage(image, x, y, null);
         }
-        gc.dispose();
-
-        // Rotate content
-        AffineTransform at = new AffineTransform();
-        at.rotate(Math.toRadians(rotation), width / 2.0, height / 2.0);
-        Graphics2D gRot = (Graphics2D) g.create();
-        gRot.translate(x, y);
-        gRot.setTransform(at);
-        gRot.drawImage(content, 0, 0, null);
-        gRot.dispose();
-
-        // Final blit
-        g.drawImage(tileSurface, x, y, null);
     }
 }
