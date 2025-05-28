@@ -1,5 +1,10 @@
 package manager;
+
 import java.util.*;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import player.Player;
 import Property.Property;
 import Define.Dice;
@@ -7,6 +12,7 @@ import main.GamePanel;
 import main.Main;
 import main.MainBoard;
 import manager.UIManager;
+import card.card;
 
 public class GameManager {
     private List<Player> players;
@@ -16,9 +22,11 @@ public class GameManager {
     private String activeEvent;
     private UIManager uiManager;
     private MainBoard mainBoard;
+    private JFrame frame;
+    private Random random=new Random();
 
 
-    public GameManager(List<Player> players, List<Property> properties,UIManager uiManager,MainBoard mainBoard) {
+    public GameManager(List<Player> players, List<Property> properties,UIManager uiManager,MainBoard mainBoard,JFrame frame) {
         this.players = players;
         this.properties = properties;
         this.currentPlayerIndex = 0;
@@ -26,6 +34,7 @@ public class GameManager {
         this.activeEvent = null;
         this.uiManager=uiManager;
         this.mainBoard=mainBoard;
+        this.frame=frame;
     }
 
     public Player getCurrentPlayer() {
@@ -115,8 +124,7 @@ public class GameManager {
 
         public void movePlayer(int steps,MainBoard mainBoard,UIManager uiManager,GamePanel gamePanel){
             Player player = getCurrentPlayer();
-            player.move(steps,mainBoard,uiManager,gamePanel);
-            // player.setIndex(player.getIndex()+steps);
+            player.move(steps,mainBoard,uiManager,gamePanel,this);
         }
 
         public void buyProperty(Property landedProperty,Player player){
@@ -155,27 +163,69 @@ public class GameManager {
                 uiManager.drawUpgradeMenu(player,landedProperty);
             }
         } 
-    // public boolean upgradeProperty(Property property, Player player, UIManager uiManager) {
-    //     if (!property.getOwner().equals(player)) {
-    //         uiManager.pauseAndShowMessage("Can not upgrade property not owned by you!", 1500);
-    //         return false;
-    //     }
 
-    //     int cost = (int)property.getUpgradeCost();
-    //     if (player.getMoney() >= cost) {
-    //         if (property.upgrade()) {
-    //             player.chargeMoney(cost);
-    //             uiManager.showUpgradeAnimation(property.getName(), property.getLevel());
-    //             uiManager.pauseAndShowMessage("Upgrade " + property.getName() + " to level " + property.getLevel());
-    //             return true;
-    //         } else {
-    //             uiManager.pauseAndShowMessage("Maximum level reached!", 1500);
-    //         }
-    //     } else {
-    //         uiManager.pauseAndShowMessage("Not enough money to upgrade!", 1500);
-    //     }
-    //     return false;
-    // }
+        public void specialTileDealing(List<card> cards) {
+            Player player = getCurrentPlayer();
+            card card = cards.get(new Random().nextInt(cards.size()));
+            card.applyEffect(player);
+        }
+
+        public void bigTileDealing(){
+             Player player = getCurrentPlayer();
+             int index=player.getIndex();
+             if(properties.get(index).getName().equals("START")){
+                player.addMoney(3000);
+                JOptionPane.showMessageDialog(frame, "you go through START and get $3000");
+             }
+             else if (properties.get(index).getName().equals("PRISON")){
+                player.setJailStatus(true);
+                player.setJailTurnLeft(3);
+             }
+        }
+
+        public void moveProcess(){
+            Player player = getCurrentPlayer();
+            int index=player.getIndex();
+            if(properties.get(index).getName().equals("CHANCE")){
+                        specialTileDealing(card.chanceCard());
+                    }
+                    else if(properties.get(index).getName().equals("COMMUNITY CHEST")){
+                        specialTileDealing(card.communityCard());
+                    }
+                    else if(index==0 || index==7 || index==21 || index==28){
+                        bigTileDealing();
+                    }
+                    else{
+                        processCurrentProperty();
+                        processUpgradeProperty();
+                    }
+        }
+
+        public void prisonProcess(){
+            Player player = getCurrentPlayer();
+    Dice dice = new Dice();
+    dice.roll();
+    JOptionPane.showMessageDialog(null, player.getName() + " rolled " + dice.getDie1() + " and " + dice.getDie2());
+
+    if (dice.isDouble()) {
+        player.setJailStatus(false);
+        player.setJailTurnLeft(0);
+        JOptionPane.showMessageDialog(null, player.getName() + " rolled a double and is free!");
+    } else {
+        // Vẫn bị tù
+        int turnsLeft = player.getJailTurnLeft() - 1;
+        player.setJailTurnLeft(turnsLeft);
+        JOptionPane.showMessageDialog(null, player.getName() + " stays in jail. Turns left: " + turnsLeft);
+
+        if (turnsLeft <= 0) {
+            // Hết lượt, trả tiền để ra
+            player.chargeMoney(500);
+            player.setJailStatus(false);
+            JOptionPane.showMessageDialog(null, player.getName() + " paid $500 and is free!");
+        }
+    }
+        }
+ 
 
     // public void animateTransfer(Player fromPlayer, Player toPlayer, String propertyName, DrawBoard drawBoard, Player player1, Player player2, UIManager uiManager) {
     //     String text = fromPlayer.getName() + " sold " + propertyName + " to " + toPlayer.getName();

@@ -30,4 +30,5 @@ public class Dice {
     public boolean isDouble() {
         return dice1 == dice2;
     }
+
 }

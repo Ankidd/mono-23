@@ -6,13 +6,14 @@ import javax.swing.Timer;
 import java.util.ArrayList;
 import java.awt.event.*;
 
-
+import manager.GameManager;
 import manager.UIManager;
 import Define.Define;
 import Define.GameState;
 import Property.Property;
 import main.MainBoard;
 import main.GamePanel;
+import card.card;
 
 public class Player {
     private int index;
@@ -40,9 +41,7 @@ public class Player {
         this.money = 10000;
         this.jailStatus = false;
         this.hasOutJailCard = false;
-        this.inJail = false;
         this.jailTurnsLeft = 0;
-        this.canRollAfterJail = false;
         this.bankruptcyStatus = false;
         this.ownedProperties = new ArrayList<>();
         this.properties = properties;
@@ -69,6 +68,14 @@ public class Player {
         }
         this.bankruptcyStatus = totalVal <= 0;
         return bankruptcyStatus;
+    }
+
+    public void setJailStatus(boolean check){
+        this.jailStatus=check;
+    }
+
+    public void setJailTurnLeft(int turn){
+        this.jailTurnsLeft=turn;
     }
 
     public void checkStatus() {
@@ -118,7 +125,7 @@ public class Player {
     }
 
 
-    public void move(int steps, MainBoard mainBoard, UIManager uiManager,GamePanel gamePanel) {
+    public void move(int steps, MainBoard mainBoard, UIManager uiManager,GamePanel gamePanel,GameManager gameManager) {
         if(is_moving){return;}
         is_moving=true;
         final int[] currentStep = {0};
@@ -134,6 +141,7 @@ public class Player {
                     currentStep[0]++;
                 } else {
                     ((Timer)e.getSource()).stop(); 
+                    gameManager.moveProcess();
                     gamePanel.setGameState(GameState.WAITING_FOR_PROPERTY_ACTION);
                     is_moving=false;
                 }
@@ -167,7 +175,12 @@ public class Player {
     public List<Property> getOwnedProperties() { return ownedProperties; }
     public boolean hasOutJailCard() { return hasOutJailCard; }
     public void setOutJailCard(boolean status) { this.hasOutJailCard = status; }
-
+    public boolean getJailStatus(){
+        return this.jailStatus;
+    }
+    public int getJailTurnLeft(){
+        return this.jailTurnsLeft;
+    }
     public void setIndex(int index){
         this.index=index;
     }

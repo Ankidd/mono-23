@@ -30,7 +30,7 @@ public class Main{
         MainBoard board = new MainBoard(properties, players);
 
         UIManager uiManager=new UIManager(null,null,null,properties,players,frame);
-        GameManager gameManager = new GameManager(players, properties,uiManager,board);
+        GameManager gameManager = new GameManager(players, properties,uiManager,board,frame);
 
         
         GamePanel gamePanel = new GamePanel(properties, players, gameManager, uiManager);

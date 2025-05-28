@@ -66,25 +66,30 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    public void gameUpdate() {
-        Dice dice = new Dice();
-        if (keyH.roll_button && gameState==gameState.IDLE) {
+   public void gameUpdate() {
+    Player player = gameManager.getCurrentPlayer();
+
+    if (keyH.roll_button && gameState == GameState.IDLE) {
+        keyH.roll_button = false;
+
+        if (player.isInJail()) {
+            gameManager.prisonProcess();
+        } else {
+            Dice dice = new Dice();
             dice.roll();
-            gameState=gameState.MOVING;
-            gameManager.movePlayer(0, mainBoard, uiManager,this);
-            keyH.roll_button=false;
-        }
-
-        if (gameState == GameState.WAITING_FOR_PROPERTY_ACTION) {
-            gameManager.processCurrentProperty();
-            gameManager.processUpgradeProperty();
-            gameState = GameState.IDLE; 
-        }
-
-        if (keyH.exit) {
-            System.exit(0);
+            gameState = GameState.MOVING;
+            gameManager.movePlayer(7, mainBoard, uiManager, this);
         }
     }
+
+    if (gameState == GameState.WAITING_FOR_PROPERTY_ACTION) {
+        gameState = GameState.IDLE;
+    }
+
+    if (keyH.exit) {
+        System.exit(0);
+    }
+}
 
     public void setGameState(GameState state){
         gameState=state;
