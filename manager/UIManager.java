@@ -10,6 +10,8 @@ import main.MainBoard;
 import player.Player;
 import Define.ActionMenuPanel;
 import Define.Define;
+import Define.Dice;
+
 
 public class UIManager {
     private JPanel panel;
@@ -99,7 +101,9 @@ public class UIManager {
     //     g.drawString("DONE", doneRect.x + 30, doneRect.y + 28);
     //     sellButtons.add(new SellButton(doneRect, "DONE"));
     // }
+    public void drawDicePanel(){
 
+    }
 
     public void drawBuyPropertyMenu(Player player, Property property) {
         int choice = JOptionPane.showConfirmDialog(
@@ -110,9 +114,13 @@ public class UIManager {
         );
 
         if (choice == JOptionPane.YES_OPTION) {
-            player.chargeMoney(property.getValue());
-            player.addProperty(property);
-            JOptionPane.showMessageDialog(frame, "You bought " + property.getName() + "!");
+            if(player.getMoney()>=property.getValue()){
+                player.chargeMoney(property.getValue());
+                player.addProperty(property);
+                JOptionPane.showMessageDialog(frame, "You bought " + property.getName() + "!");}
+            else{
+                JOptionPane.showMessageDialog(frame,"you do not have enough money to buy "+ property.getName());
+            }
         } else {
             JOptionPane.showMessageDialog(frame, "You chose not to buy " + property.getName() + ".");
         }
@@ -228,4 +236,5 @@ public class UIManager {
     public void setSellTargetMoney(int amount){
         this.sellTargetMoney=amount;
     }
+
 }

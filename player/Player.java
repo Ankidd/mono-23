@@ -2,6 +2,8 @@ package player;
 
 import java.awt.*;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import java.util.ArrayList;
 import java.awt.event.*;
@@ -144,7 +146,7 @@ public class Player {
                     gameManager.moveProcess();
                     gamePanel.setGameState(GameState.WAITING_FOR_PROPERTY_ACTION);
                     is_moving=false;
-                }
+                    }
             }
         });
 
@@ -177,6 +179,9 @@ public class Player {
     public void setOutJailCard(boolean status) { this.hasOutJailCard = status; }
     public boolean getJailStatus(){
         return this.jailStatus;
+    }
+    public void setInJail(boolean status){
+        this.inJail=status;
     }
     public int getJailTurnLeft(){
         return this.jailTurnsLeft;

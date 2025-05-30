@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import player.Player;
 import Property.Property;
@@ -120,12 +121,11 @@ public class GameManager {
     //             break;
     //     }
     // }
-
-
-        public void movePlayer(int steps,MainBoard mainBoard,UIManager uiManager,GamePanel gamePanel){
-            Player player = getCurrentPlayer();
-            player.move(steps,mainBoard,uiManager,gamePanel,this);
-        }
+    
+    public void movePlayer(int steps,MainBoard mainBoard,UIManager uiManager,GamePanel gamePanel){
+        Player player = getCurrentPlayer();
+        player.move(steps,mainBoard,uiManager,gamePanel,this);
+    }
 
         public void buyProperty(Property landedProperty,Player player){
             javax.swing.SwingUtilities.invokeLater(() -> {
@@ -164,10 +164,20 @@ public class GameManager {
             }
         } 
 
-        public void specialTileDealing(List<card> cards) {
+        public void cardDealing(List<card> cards) {
             Player player = getCurrentPlayer();
             card card = cards.get(new Random().nextInt(cards.size()));
             card.applyEffect(player);
+        }
+
+        public void taxDealing(){
+            Player player = getCurrentPlayer();
+            int total_value=0;
+            for(Property prop:player.getOwnedProperties()){
+                total_value+=prop.getValue();
+            }
+            player.chargeMoney(total_value);
+            JOptionPane.showMessageDialog(frame,"you have paid tax $"+total_value);
         }
 
         public void bigTileDealing(){
@@ -178,7 +188,9 @@ public class GameManager {
                 JOptionPane.showMessageDialog(frame, "you go through START and get $3000");
              }
              else if (properties.get(index).getName().equals("PRISON")){
+                JOptionPane.showMessageDialog(frame, "you are in prison");
                 player.setJailStatus(true);
+                player.setInJail(true);
                 player.setJailTurnLeft(3);
              }
         }
@@ -187,13 +199,16 @@ public class GameManager {
             Player player = getCurrentPlayer();
             int index=player.getIndex();
             if(properties.get(index).getName().equals("CHANCE")){
-                        specialTileDealing(card.chanceCard());
+                        cardDealing(card.chanceCard());
                     }
                     else if(properties.get(index).getName().equals("COMMUNITY CHEST")){
-                        specialTileDealing(card.communityCard());
+                        cardDealing(card.communityCard());
                     }
                     else if(index==0 || index==7 || index==21 || index==28){
                         bigTileDealing();
+                    }
+                    else if(properties.get(index).getName().equals("TAX")){
+                        taxDealing();
                     }
                     else{
                         processCurrentProperty();
@@ -209,6 +224,7 @@ public class GameManager {
 
             if (dice.isDouble()) {
                 player.setJailStatus(false);
+                player.setInJail(false);
                 player.setJailTurnLeft(0);
                 JOptionPane.showMessageDialog(null, player.getName() + " rolled a double and is free!");
             } else {
@@ -221,6 +237,7 @@ public class GameManager {
                     // Hết lượt, trả tiền để ra
                     player.chargeMoney(500);
                     player.setJailStatus(false);
+                    player.setInJail(false);
                     JOptionPane.showMessageDialog(null, player.getName() + " paid $500 and is free!");
                 }
             }

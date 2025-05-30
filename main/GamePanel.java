@@ -17,6 +17,7 @@ import Define.GameState;
 import Define.keyHandler;
 import Define.GameState;
 
+
 public class GamePanel extends JPanel implements Runnable {
     private MainBoard mainBoard;
     private GameManager gameManager;
@@ -28,6 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Timer gameTimer;
     private GameState gameState = GameState.IDLE;
     private int stepsRemaining = 0;
+
 
     public GamePanel(List<Property> properties, List<Player> players, GameManager gameManager, UIManager uiManager) {
         this.properties = properties;
@@ -67,31 +69,32 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
    public void gameUpdate() {
-    Player player = gameManager.getCurrentPlayer();
+        Player player = gameManager.getCurrentPlayer();
 
-    if (keyH.roll_button && gameState == GameState.IDLE) {
-        keyH.roll_button = false;
+        if (keyH.roll_button && gameState == GameState.IDLE) {
+            keyH.roll_button = false;
 
-        if (player.isInJail()) {
-            gameManager.prisonProcess();
-        } else {
-            Dice dice = new Dice();
-            dice.roll();
-            gameState = GameState.MOVING;
-            gameManager.movePlayer(7, mainBoard, uiManager, this);
+            if (player.isInJail()) {
+                gameManager.prisonProcess();
+                System.out.println("in jail");
+            } else {
+                Dice dice = new Dice();
+                dice.roll();
+                gameState = GameState.MOVING;
+                gameManager.movePlayer(7, mainBoard, uiManager, this);
+            }
+        }
+
+        if (gameState == GameState.WAITING_FOR_PROPERTY_ACTION) {
+            gameState = GameState.IDLE;
+        }
+
+        if (keyH.exit) {
+            System.exit(0);
         }
     }
 
-    if (gameState == GameState.WAITING_FOR_PROPERTY_ACTION) {
-        gameState = GameState.IDLE;
+        public void setGameState(GameState state){
+            gameState=state;
+        }
     }
-
-    if (keyH.exit) {
-        System.exit(0);
-    }
-}
-
-    public void setGameState(GameState state){
-        gameState=state;
-    }
-}
