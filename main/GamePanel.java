@@ -2,6 +2,7 @@ package main;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Map;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ import Define.Dice;
 import Define.GameState;
 import Define.keyHandler;
 import Define.GameState;
+import Define.Define;
 
 
 public class GamePanel extends JPanel implements Runnable {
@@ -29,21 +31,31 @@ public class GamePanel extends JPanel implements Runnable {
     private Timer gameTimer;
     private GameState gameState = GameState.IDLE;
     private int stepsRemaining = 0;
+    Map<Integer,ImageIcon> map=Dice.diceMap();
+    private JLabel diceLabel1 = new JLabel(); 
+    private JLabel diceLabel2 = new JLabel(); 
 
 
-    public GamePanel(List<Property> properties, List<Player> players, GameManager gameManager, UIManager uiManager) {
+    public GamePanel(List<Property> properties, List<Player> players, GameManager gameManager, UIManager uiManager,JLabel diceLabel1, JLabel diceLabel2) {
         this.properties = properties;
         this.players = players;
         this.gameManager = gameManager;
         this.uiManager = uiManager;
+        this.diceLabel1 = diceLabel1;
+        this.diceLabel2 = diceLabel2;
+        // this.diceLabel1.setBounds(100, 600, 64, 64);
+        // this.diceLabel2.setBounds(180, 600, 64, 64);
 
         this.mainBoard = new MainBoard(properties, players);
-        this.setLayout(new BorderLayout());
-        this.add(mainBoard, BorderLayout.CENTER);
+        this.setLayout(null);
+        // this.add(diceLabel1);
+        // this.add(diceLabel2);
+        mainBoard.setBounds(0,0,Define.WIDTH,Define.HEIGHT);
+        this.add(mainBoard);
 
         this.addKeyListener(keyH);
-        this.setFocusable(true);
-        this.requestFocusInWindow();
+        // this.setFocusable(true);
+        // this.requestFocusInWindow();
 
         gameTimer = new Timer(16, new ActionListener() {
             @Override
@@ -78,10 +90,11 @@ public class GamePanel extends JPanel implements Runnable {
                 gameManager.prisonProcess();
                 System.out.println("in jail");
             } else {
-                Dice dice = new Dice();
-                dice.roll();
-                gameState = GameState.MOVING;
-                gameManager.movePlayer(7, mainBoard, uiManager, this);
+                // Dice dice = new Dice();
+                // dice.roll();
+                // gameState = GameState.MOVING;
+                // gameManager.movePlayer(7, mainBoard, uiManager, this);
+                gameManager.rollProcess(diceLabel1, diceLabel2, this);
             }
         }
 

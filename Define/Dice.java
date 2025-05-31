@@ -2,6 +2,13 @@ package Define;
 
 import java.util.Random;
 
+import javax.swing.ImageIcon;
+
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
 public class Dice {
     private int dice1;
     private int dice2;
@@ -31,5 +38,13 @@ public class Dice {
         return dice1 == dice2;
     }
 
+    public static Map<Integer,ImageIcon> diceMap(){
+        Map<Integer,ImageIcon> map=new HashMap<>();
+        List<BufferedImage> diceList=image.diceList();
+        for(int i=0;i<6;i++){
+            map.put(i+1,new ImageIcon(diceList.get(i)));
+        }
+        return map;
+    }
     
 }

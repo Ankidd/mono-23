@@ -3,12 +3,20 @@ package manager;
 import java.util.*;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import java.awt.image.BufferedImage;
+
+import javax.swing.ImageIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 import player.Player;
 import Property.Property;
 import Define.Dice;
+import Define.image;
 import main.GamePanel;
 import main.Main;
 import main.MainBoard;
@@ -25,6 +33,7 @@ public class GameManager {
     private MainBoard mainBoard;
     private JFrame frame;
     private Random random=new Random();
+    private List<BufferedImage> diceIcons=image.diceList();
 
 
     public GameManager(List<Player> players, List<Property> properties,UIManager uiManager,MainBoard mainBoard,JFrame frame) {
@@ -242,7 +251,43 @@ public class GameManager {
                 }
             }
         }
- 
+
+        public void rollProcess(JLabel diceLabel1, JLabel diceLabel2, GamePanel gamePanel) {
+                Dice dice = new Dice(); 
+                Map<Integer, ImageIcon> map = Dice.diceMap();
+                Random rand = new Random();
+                long startTime = System.currentTimeMillis();
+
+                Timer timer = new Timer(200, null);
+                timer.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        long elapsed = System.currentTimeMillis() - startTime;
+
+                        if (elapsed >= 1000) {
+                            ((Timer) e.getSource()).stop();
+
+                            dice.roll();
+                            int die1 = dice.getDie1();
+                            int die2 = dice.getDie2();
+
+                            diceLabel1.setIcon(map.get(die1));
+                            diceLabel2.setIcon(map.get(die2));
+
+                            int steps = die1 + die2;
+                            movePlayer(steps, mainBoard, uiManager, gamePanel);
+                        } else {
+                            int temp1 = 1 + rand.nextInt(6);
+                            int temp2 = 1 + rand.nextInt(6);
+                            diceLabel1.setIcon(map.get(temp1));
+                            diceLabel2.setIcon(map.get(temp2));
+                        }
+                    }
+                });
+
+                timer.start();
+            }
+
 
     // public void animateTransfer(Player fromPlayer, Player toPlayer, String propertyName, DrawBoard drawBoard, Player player1, Player player2, UIManager uiManager) {
     //     String text = fromPlayer.getName() + " sold " + propertyName + " to " + toPlayer.getName();

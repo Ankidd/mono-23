@@ -1,9 +1,6 @@
 package main;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,61 +11,68 @@ import manager.GameManager;
 import player.Player;
 import manager.UIManager;
 
-
-
-public class Main{
+public class Main {
     public static void main(String[] args) {
-        System.out.println(Define.WIDTH+" "+Define.HEIGHT);
+        System.out.println(Define.WIDTH + " " + Define.HEIGHT);
+
         JFrame frame = new JFrame("Monopoly Board");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(Define.WIDTH, Define.HEIGHT); 
-        
+        frame.setSize(Define.WIDTH, Define.HEIGHT);
+
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         gd.setFullScreenWindow(frame);
 
-        // Tắt layout để tự do đặt tọa độ
-        frame.setLayout(null);
+        // Tạo JLayeredPane để quản lý nhiều lớp giao diện
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setBounds(0, 0, Define.WIDTH, Define.HEIGHT);
+        layeredPane.setLayout(null);
 
-        // Tạo panel dice riêng, bạn có thể tự đặt vị trí sau
+        // Tạo dicePanel riêng biệt
         JPanel dicePanel = new JPanel();
-        dicePanel.setLayout(new FlowLayout());
-        dicePanel.setOpaque(false);  // Nếu muốn trong suốt background để thấy board dưới
+        dicePanel.setBackground(new Color(0, 0, 0, 0)); // trong suốt
+        dicePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        // dicePanel.setOpaque(false);
 
         JLabel diceLabel1 = new JLabel();
         JLabel diceLabel2 = new JLabel();
 
+        // Gán icon mặc định cho diceLabels
+        diceLabel1.setIcon(Dice.diceMap().get(1));
+        diceLabel2.setIcon(Dice.diceMap().get(2));
+
         dicePanel.add(diceLabel1);
         dicePanel.add(diceLabel2);
 
-        // Đặt kích thước và vị trí cụ thể cho dicePanel
-        dicePanel.setBounds(900, 700, 150, 60);  // ví dụ: x=900, y=700, rộng=150, cao=60
+        // Đặt kích thước và vị trí cho dicePanel (đảm bảo không bị che)
+        dicePanel.setBounds(Define.WIDTH/2-100, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-100, 150, 70);
 
+        // Khởi tạo các thành phần khác
         List<Property> properties = Property.createProperties();
         List<Player> players = new ArrayList<>();
         players.add(new Player("An", 1, Color.RED, properties, 0));
         MainBoard board = new MainBoard(properties, players);
-
-        // Đặt kích thước và vị trí cho board
-        board.setBounds(0, 0, 900, 760);  // bạn tùy chỉnh theo kích thước màn hình và mong muốn
+        board.setBounds(0, 0, 900, 760);
 
         UIManager uiManager = new UIManager(null, null, null, properties, players, frame);
         GameManager gameManager = new GameManager(players, properties, uiManager, board, frame);
 
-        // Chú ý truyền đúng diceLabel1, diceLabel2 vào GamePanel
-        GamePanel gamePanel = new GamePanel(properties, players, gameManager, uiManager);
-
-        // Với cách làm này, gamePanel nên có kích thước và vị trí đầy đủ
-        // Nếu gamePanel chứa MainBoard rồi, bạn có thể set kích thước phù hợp
+        // Truyền đúng diceLabel vào GamePanel
+        GamePanel gamePanel = new GamePanel(properties, players, gameManager, uiManager, diceLabel1, diceLabel2);
         gamePanel.setBounds(0, 0, Define.WIDTH, Define.HEIGHT);
 
-        // Thêm gamePanel và dicePanel vào frame
-        frame.add(dicePanel);
-        frame.add(gamePanel);
+        // Thêm các panel vào JLayeredPane với thứ tự lớp
+        layeredPane.add(gamePanel, JLayeredPane.DEFAULT_LAYER); // gamePanel ở dưới
+        layeredPane.add(dicePanel, JLayeredPane.PALETTE_LAYER);  // dicePanel ở trên
+
+        // Thay thế content pane của frame bằng layeredPane
+        frame.setContentPane(layeredPane);
 
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
+        // Đảm bảo gamePanel nhận focus để xử lý input
+        SwingUtilities.invokeLater(() -> gamePanel.requestFocusInWindow());
+
         gamePanel.startGameThread();
     }
 }
-
