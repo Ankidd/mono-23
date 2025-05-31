@@ -9,8 +9,10 @@ import Property.Property;
 import main.MainBoard;
 import player.Player;
 import Define.ActionMenuPanel;
+import Define.DecisionMenuPanel;
 import Define.Define;
 import Define.Dice;
+import Define.DecisionMenuPanel;
 
 
 public class UIManager {
@@ -101,60 +103,144 @@ public class UIManager {
     //     g.drawString("DONE", doneRect.x + 30, doneRect.y + 28);
     //     sellButtons.add(new SellButton(doneRect, "DONE"));
     // }
-    public void drawDicePanel(){
+    public void showSellpropertyMenu(Player player) {
+        List<Property> owned = player.getOwnedProperties();
+        if (owned.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, player.getName() + " has no properties to sell!");
+            return;
+        }
 
+        // Tạo combobox chọn property
+        String[] propertyOptions = new String[owned.size()];
+        for (int i = 0; i < owned.size(); i++) {
+            Property p = owned.get(i);
+            propertyOptions[i] = p.getName() + " (Sell for $" + (p.getValue() / 2) + ")";
+        }
+
+        JComboBox<String> comboBox = new JComboBox<>(propertyOptions);
+        JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        contentPanel.add(new JLabel("Select a property to sell:"), BorderLayout.NORTH);
+        contentPanel.add(comboBox, BorderLayout.CENTER);
+
+        int result = JOptionPane.showConfirmDialog(
+            frame,
+            contentPanel,
+            "Sell Property",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION && comboBox.getSelectedIndex() >= 0) {
+            Property selected = owned.get(comboBox.getSelectedIndex());
+            int sellPrice = selected.getValue() / 2;
+
+            String title = "Sell Property: " + selected.getName();
+            String description = "Do you want to sell " + selected.getName() + " for $" + sellPrice + "?";
+
+            DecisionMenuPanel panel = new DecisionMenuPanel(
+                frame,
+                title,
+                description,
+                "Sell",
+                "Cancel",
+                e -> {
+                    player.addMoney(sellPrice);
+                    player.getOwnedProperties().remove(selected);
+                    selected.setOwned(false);
+                    selected.setOwner(null);
+
+                    JOptionPane.showMessageDialog(frame, "You sold " + selected.getName() + " for $" + sellPrice + ".");
+
+                    // Nếu cần ép bán tiếp
+                    if (player.getMoney() < sellTargetMoney && sellMode && player.getOwnedProperties().size() > 0) {
+                        showSellpropertyMenu(player);
+                    }
+                },
+                e -> {
+                    JOptionPane.showMessageDialog(frame, "Sell cancelled.");
+                }
+            );
+
+            panel.showDialog();
+        }
     }
 
     public void drawBuyPropertyMenu(Player player, Property property) {
-        int choice = JOptionPane.showConfirmDialog(
-            frame,
-            "Do you want to buy " + property.getName() + " for $" + property.getValue() + "?",
-            "Buy Property",
-            JOptionPane.YES_NO_OPTION
-        );
-
-        if (choice == JOptionPane.YES_OPTION) {
-            if(player.getMoney()>=property.getValue()){
-                player.chargeMoney(property.getValue());
-                player.addProperty(property);
-                JOptionPane.showMessageDialog(frame, "You bought " + property.getName() + "!");}
-            else{
-                JOptionPane.showMessageDialog(frame,"you do not have enough money to buy "+ property.getName());
-            }
-        } else {
-            JOptionPane.showMessageDialog(frame, "You chose not to buy " + property.getName() + ".");
+        String title = "Buy Property: " + property.getName();
+        StringBuilder descBuilder = new StringBuilder();
+        int baseValue = property.getValue();
+        descBuilder.append("Price: $" + property.getValue()+"\n");
+        for (int i = 0; i <= 5; i++) {
+            baseValue += baseValue * 0.3; // mỗi level tăng 30%
+            int rent = (int)(baseValue * 0.1); // rent = 10% giá trị
+            descBuilder.append("Rent (Level ").append(i).append("): $").append(rent).append("\n");
         }
 
+        String description = descBuilder.toString();
+
+        DecisionMenuPanel panel = new DecisionMenuPanel(
+            frame,
+            title,
+            description,
+            "Buy",
+            "Cancel",
+            e -> {
+                if (player.getMoney() >= property.getValue()) {
+                    player.chargeMoney(property.getValue());
+                    player.addProperty(property);
+                    JOptionPane.showMessageDialog(frame, "You bought " + property.getName() + "!");
+                } else {
+                    JOptionPane.showMessageDialog(frame, "You do not have enough money to buy " + property.getName());
+                }
+            },
+            e -> {
+                // Hành động khi nhấn Cancel (nếu cần)
+                JOptionPane.showMessageDialog(frame, "You chose not to buy " + property.getName() + ".");
+            }
+        );
+
+        panel.showDialog();
     }
 
     public void drawUpgradeMenu(Player player, Property property) {
-    if (property.getLevel() >= 5) {
-        JOptionPane.showMessageDialog(frame, "You have reached the maximum level.");
-        return;
-    }
+        String title = "upgrade Property: " + property.getName();
+        StringBuilder descBuilder = new StringBuilder();
+        descBuilder.append("Upgrade Price: $").append(property.getUpgradeCost()).append("\n");
 
-    String title = "Upgrade " + property.getName();
-    String desc = "Level " + property.getLevel() + " → " + (property.getLevel() + 1)
-                + " | Cost: $" + property.getUpgradeCost();
-
-    ActionMenuPanel panel = new ActionMenuPanel(
-        frame,
-        title,
-        desc,
-        "Upgrade",
-        e -> {
-            if (player.getMoney() >= property.getUpgradeCost()) {
-                player.chargeMoney(property.getUpgradeCost());
-                property.setLevel(property.getLevel() + 1);
-                JOptionPane.showMessageDialog(frame, "Upgraded to level " + property.getLevel());
-            } else {
-                JOptionPane.showMessageDialog(frame, "Not enough money to upgrade.");
-            }
+        int baseValue = property.getValue();
+        for (int i = 0; i <= 5; i++) {
+            baseValue += baseValue * 0.3; // mỗi level tăng 30%
+            int rent = (int)(baseValue * 0.1); // rent = 10% giá trị
+            descBuilder.append("Rent (Level ").append(i).append("): $").append(rent).append((property.getLevel()==i) ?"(now)\n":"\n");
         }
-    );
 
-    panel.showDialog(frame, "Upgrade Property");
-}
+        String description = descBuilder.toString();
+        DecisionMenuPanel panel = new DecisionMenuPanel(
+            frame,
+            title,
+            description,
+            "Upgrade",
+            "Cancel",
+            e -> {
+                if (player.getMoney() >= property.getUpgradeCost()) {
+                    player.chargeMoney(property.getUpgradeCost());
+                    if (property.upgrade()) {
+                        JOptionPane.showMessageDialog(frame, "Upgraded to level " + property.getLevel());
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Max level reached.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Not enough money to upgrade.");
+                }
+            },
+            e -> {
+                // Hành động khi nhấn Cancel (nếu cần)
+            }
+        );
+
+        panel.showDialog();
+    }
 
 
     public void drawCountdownTimer(Graphics g) {

@@ -83,6 +83,20 @@ public class GameManager {
     //     uiManager.setSellTargetMoney(amountNeeded);
     //     return false;
     // }
+    public void nextTurn() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        turnCounter++;
+
+        // Reset các trạng thái nếu cần
+        StringBuilder sb=new StringBuilder();
+        sb.append("next turn: "+getCurrentPlayer().getName());
+        JOptionPane.showMessageDialog(frame,sb.toString());
+
+        // Nếu muốn random event theo số vòng chơi
+        if (turnCounter % 5 == 0) {
+            triggerRandomEvent();
+        }
+    }
 
     public void removePlayer(Player player) {
         for (Property p : player.getOwnedProperties()) {
@@ -142,10 +156,15 @@ public class GameManager {
             });
         }
 
-        public void payRent(Property landedProperty,Player player){
+        public void payRentProcess(Property landedProperty,Player player){
             if(!landedProperty.getOwner().getName().equals(player.getName())){
                 Player owner=landedProperty.getOwner();
-                player.payPlayer(owner, landedProperty.getRent());
+                if(player.getMoney()<landedProperty.getRent()){
+                    uiManager.showSellpropertyMenu(player);
+                }
+                else{
+                    player.payPlayer(owner, landedProperty.getRent());
+                }
             }
         }
 
@@ -158,7 +177,7 @@ public class GameManager {
                 buyProperty(landedProperty, player);
             } else if (!landedProperty.getOwner().getName().equals(player.getName())) {
                 // Nếu có chủ khác -> trả tiền thuê
-                payRent(landedProperty,player);
+                payRentProcess(landedProperty,player);
             }
         }
 
@@ -287,6 +306,39 @@ public class GameManager {
 
                 timer.start();
             }
+
+        public void triggerRandomEvent() {
+            String[] events = {"storm", "inflation", "crisis", "boom"};
+            activeEvent = events[random.nextInt(events.length)];
+
+            // uiManager.playEventAnimation(activeEvent); // hiện hiệu ứng
+
+            switch (activeEvent) {
+                case "storm":
+                    for (Property tile : properties) {
+                        tile.setValue((int)(tile.getValue() * 0.5));
+                    }
+                    break;
+                case "inflation":
+                    for (Property tile : properties) {
+                        tile.setValue((int)(tile.getValue() * 1.3));
+                    }
+                    break;
+                case "crisis":
+                    for (Player p : players) {
+                        p.chargeMoney((int)(0.5 * p.getMoney()));
+                    }
+                    break;
+                case "boom":
+                    for (Player p : players) {
+                        p.addMoney((int)(0.1 * p.getMoney()));
+                    }
+                    break;
+            }
+
+            JOptionPane.showMessageDialog(frame, "Event: " + activeEvent.toUpperCase() + " occurred!");
+        }
+
 
 
     // public void animateTransfer(Player fromPlayer, Player toPlayer, String propertyName, DrawBoard drawBoard, Player player1, Player player2, UIManager uiManager) {

@@ -30,7 +30,7 @@
             this.owner = null;
             this.level=0;
             this.festival=false;
-            rent=(int)(value * 0.06);
+            this.rent = (int)(value * 0.1); 
         }
 
         // Getters
@@ -106,10 +106,11 @@
                 this.name.equals(other.name);
         }
 
-        public boolean upgrade(){
-            if (this.level<5){
-                this.level+=1;
-                this.value+=(int)value*0.6;
+        public boolean upgrade() {
+            if (this.level < 5) {
+                this.level += 1;
+                this.value += (int)(this.value * 0.3);  
+                this.rent = (int)(this.value * 0.1);   
                 return true;
             }
             return false;

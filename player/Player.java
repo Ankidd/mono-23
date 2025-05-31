@@ -7,6 +7,8 @@ import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import java.util.ArrayList;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.util.Map;
 
 import manager.GameManager;
 import manager.UIManager;
@@ -35,11 +37,16 @@ public class Player {
     private List<Property> ownedProperties;
     private List<Property> properties;
 
-    public Player(String name, int playerNumber, Color color, List<Property> properties, int startIndex) {
+    private String direction ; // "up", "down", "left", "right"
+    private int currentFrameIndex ;
+    private Timer animationTimer;
+    private Map<String,List<BufferedImage>> spriteImages;
+
+    public Player(String name, int playerNumber, Color color, List<Property> properties,Map<String,List<BufferedImage>> spriteImages) {
         this.name = name;
         this.playerNumber = playerNumber;
         this.color = color;
-        this.index = startIndex;
+        this.index = 1;
         this.money = 10000;
         this.jailStatus = false;
         this.hasOutJailCard = false;
@@ -49,6 +56,9 @@ public class Player {
         this.properties = properties;
         setPosition();
         this.is_moving=false;
+        this.direction="up";
+        this.currentFrameIndex=0;
+        this.spriteImages = spriteImages;
     }
 
     private void setPosition() {
@@ -127,42 +137,46 @@ public class Player {
     }
 
 
-    public void move(int steps, MainBoard mainBoard, UIManager uiManager,GamePanel gamePanel,GameManager gameManager) {
-        if(is_moving){return;}
-        is_moving=true;
-        final int[] currentStep = {0};
-        Timer moveTimer = new Timer(200, null);
+    public void move(int steps, MainBoard mainBoard, UIManager uiManager, GamePanel gamePanel, GameManager gameManager) {
+        if (is_moving) return;
+        is_moving = true;
 
-        moveTimer.addActionListener(new ActionListener() {
+        final int[] currentStep = {0};
+        animationTimer = new Timer(300, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (currentStep[0] < steps) {
+                    int prev = index;
                     index = (index + 1) % properties.size();
-                    setPosition();    // Cập nhật tọa độ mới
-                    mainBoard.repaint(); // Vẽ lại bảng
+                    updateDirection(prev, index); // cập nhật hướng di chuyển
+                    setPosition();
+                    currentFrameIndex = (currentFrameIndex + 1) % spriteImages.get(direction).size();
+                    mainBoard.repaint();
                     currentStep[0]++;
                 } else {
-                    ((Timer)e.getSource()).stop(); 
+                    ((Timer) e.getSource()).stop();
+                    is_moving = false;
                     gameManager.moveProcess();
                     gamePanel.setGameState(GameState.WAITING_FOR_PROPERTY_ACTION);
-                    is_moving=false;
-                    }
+                }
             }
         });
 
-        moveTimer.start();
+        animationTimer.start();
     }
 
 
     public void DrawPlayer(Graphics2D g2){
-        int radius=Define.PlayerRadius;
-        g2.setColor(this.color);
+        if (spriteImages == null || !spriteImages.containsKey(direction)) {
+            g2.setColor(this.color);
+            int radius = Define.PlayerRadius;
+            g2.fillOval(this.x - radius, this.y - radius, radius * 2, radius * 2);
+            return;
+            }
 
-        g2.fillOval(this.x-radius,this.y-radius,radius*2,radius*2);
-
-        g2.setColor(Color.BLACK);
-        g2.setStroke(new BasicStroke(2));
-        g2.drawOval(this.x-radius,this.y-radius,radius*2,radius*2);
+        List<BufferedImage> frames = spriteImages.get(direction);
+        BufferedImage frame = frames.get(currentFrameIndex % frames.size());
+        g2.drawImage(frame, this.x-50, this.y-50, 100, 100, null);
     }
 
 
@@ -190,5 +204,11 @@ public class Player {
         this.index=index;
     }
 
+    private void updateDirection(int fromIndex, int toIndex) {
+    if (fromIndex>=28 && toIndex<=41) direction = "left"; 
+    else if(fromIndex>=0 && toIndex<=7) direction="up";
+    else if(fromIndex>=7 && toIndex<=21) direction="right";
+    else if(fromIndex>=21 && toIndex<=28) direction="down";
+}
 
 }

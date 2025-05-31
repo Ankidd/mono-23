@@ -16,7 +16,6 @@ import manager.UIManager;
 import Define.Dice;
 import Define.GameState;
 import Define.keyHandler;
-import Define.GameState;
 import Define.Define;
 
 
@@ -31,9 +30,10 @@ public class GamePanel extends JPanel implements Runnable {
     private Timer gameTimer;
     private GameState gameState = GameState.IDLE;
     private int stepsRemaining = 0;
-    Map<Integer,ImageIcon> map=Dice.diceMap();
+    private Map<Integer,ImageIcon> map=Dice.diceMap();
     private JLabel diceLabel1 = new JLabel(); 
     private JLabel diceLabel2 = new JLabel(); 
+    private JButton nextTurnButton;
 
 
     public GamePanel(List<Property> properties, List<Player> players, GameManager gameManager, UIManager uiManager,JLabel diceLabel1, JLabel diceLabel2) {
@@ -43,21 +43,35 @@ public class GamePanel extends JPanel implements Runnable {
         this.uiManager = uiManager;
         this.diceLabel1 = diceLabel1;
         this.diceLabel2 = diceLabel2;
-        // this.diceLabel1.setBounds(100, 600, 64, 64);
-        // this.diceLabel2.setBounds(180, 600, 64, 64);
+        this.nextTurnButton = new JButton("Next Turn");
+        this.nextTurnButton.setEnabled(false);
+        nextTurnButton.setBounds(300, 600, 120, 40);
 
         this.mainBoard = new MainBoard(properties, players);
         this.setLayout(null);
-        // this.add(diceLabel1);
-        // this.add(diceLabel2);
         mainBoard.setBounds(0,0,Define.WIDTH,Define.HEIGHT);
+        this.add(nextTurnButton);
         this.add(mainBoard);
-
         this.addKeyListener(keyH);
-        // this.setFocusable(true);
-        // this.requestFocusInWindow();
+        
+        nextTurnButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Player currentPlayer = gameManager.getCurrentPlayer();
+                String name = currentPlayer.getName(); // nếu có getName()
+                JOptionPane.showMessageDialog(GamePanel.this,
+                        name + " đã kết thúc lượt.",
+                        "Thông báo",
+                        JOptionPane.INFORMATION_MESSAGE);
 
-        gameTimer = new Timer(16, new ActionListener() {
+                gameManager.nextTurn();
+                setGameState(GameState.IDLE);         
+                nextTurnButton.setEnabled(false);
+
+                GamePanel.this.requestFocusInWindow();
+            }
+        });
+        gameTimer = new Timer(20, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 gameUpdate();
@@ -90,16 +104,13 @@ public class GamePanel extends JPanel implements Runnable {
                 gameManager.prisonProcess();
                 System.out.println("in jail");
             } else {
-                // Dice dice = new Dice();
-                // dice.roll();
-                // gameState = GameState.MOVING;
-                // gameManager.movePlayer(7, mainBoard, uiManager, this);
                 gameManager.rollProcess(diceLabel1, diceLabel2, this);
             }
         }
 
         if (gameState == GameState.WAITING_FOR_PROPERTY_ACTION) {
             gameState = GameState.IDLE;
+            nextTurnButton.setEnabled(true);
         }
 
         if (keyH.exit) {

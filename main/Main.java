@@ -2,14 +2,18 @@ package main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import Define.*;
 import Property.Property;
 import manager.GameManager;
 import player.Player;
 import manager.UIManager;
+import Define.image;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -49,7 +53,14 @@ public class Main {
         // Khởi tạo các thành phần khác
         List<Property> properties = Property.createProperties();
         List<Player> players = new ArrayList<>();
-        players.add(new Player("An", 1, Color.RED, properties, 0));
+        Map<String,List<BufferedImage>> spriteImage1=image.spriteImages1;
+        Map<String,List<BufferedImage>> spriteImage2=image.spriteImages2;
+        Map<String,List<BufferedImage>> spriteImage3=image.spriteImages3;
+        Map<String,List<BufferedImage>> spriteImage4=image.spriteImages4;
+        players.add(new Player("An", 1, Color.RED, properties,spriteImage1));
+        players.add(new Player("Khoi", 1, Color.RED, properties,spriteImage1));
+        players.add(new Player("Khai", 1, Color.RED, properties,spriteImage1));
+        players.add(new Player("Hoan", 1, Color.RED, properties,spriteImage1));
         MainBoard board = new MainBoard(properties, players);
         board.setBounds(0, 0, 900, 760);
 
