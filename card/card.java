@@ -1,22 +1,23 @@
 package card;
 
-import java.util.Random;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import player.Player;
-import Property.Property;
+import main.MainBoard;
+import manager.GameManager;
 
 public class card {
     private String description;
     private String effect;
     private int amount;
-    private Random random=new Random();
 
     public card(String description,String effect,int amount){
         this.description=description;
         this.effect=effect;
         this.amount=amount;
+
     }
 
     public card(String description, String effect) {
@@ -45,23 +46,27 @@ public class card {
         player.chargeMoney(amount);
     }
 
-    public void goStart(Player player){
-        player.setIndex(0);
+    public void goStart(Player player,GameManager gameManager){
+        player.goToStart(MainBoard.getInstance());
+        gameManager.moveProcess();
     }
 
-    public void goJail(Player player){
-        player.goToJail();;
+    public void goJail(Player player,GameManager gameManager){
+        player.goToJail(MainBoard.getInstance());
+        gameManager.moveProcess();
     }
 
-    public void randomMove(Player player){
-        player.setIndex(random.nextInt(Property.createProperties().size()));
+    public void randomMove(Player player,GameManager gameManager){
+        player.goToRandom(MainBoard.getInstance());
+        gameManager.moveProcess();
     }
 
     public void outOfJailCard(Player player){
         player.setOutJailCard(true);
     }
 
-    public void applyEffect(Player player) {
+
+    public void applyEffect(Player player,GameManager gameManager) {
         switch (effect) {
             case "add_money":
                 addMoney(player);
@@ -70,16 +75,16 @@ public class card {
                 chargeMoney(player);
                 break;
             case "go_start":
-                goStart(player);
+                goStart(player,gameManager);
                 break;
-            case "go_to_prison":
-                goJail(player);
+            case "go_to_jail":
+                goJail(player,gameManager);
                 break;
             case "get_out_of_jail_card":
                 outOfJailCard(player);
                 break;
             case "random_move":
-                randomMove(player);
+                randomMove(player,gameManager);
                 break;
         }
     }
@@ -87,7 +92,7 @@ public class card {
     public static List<card> chanceCard(){
         List<card> ChanceCard=new ArrayList<>();
         ChanceCard.add(new card("Get $2000 from the Bank", "add_money", 2000));
-        ChanceCard.add(new card("Lose $1000 to pay taxes", "charge_money", 1000));
+        ChanceCard.add(new card("Lose $1000 to pay taxes", "charge_money", 10000));
         ChanceCard.add(new card("Go to START and get $3000", "go_start"));
         ChanceCard.add(new card("Go to Jail. Don't go through START.", "go_to_jail"));
         ChanceCard.add(new card("Get a Get Out of Jail Free card", "get_out_of_jail_card"));

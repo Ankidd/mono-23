@@ -48,7 +48,7 @@ public class Main {
         dicePanel.add(diceLabel2);
 
         // Đặt kích thước và vị trí cho dicePanel (đảm bảo không bị che)
-        dicePanel.setBounds(Define.WIDTH/2-100, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-100, 150, 70);
+        dicePanel.setBounds(Define.WIDTH/2-75, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-150, 150, 70);
 
         // Khởi tạo các thành phần khác
         List<Property> properties = Property.createProperties();
@@ -58,13 +58,13 @@ public class Main {
         Map<String,List<BufferedImage>> spriteImage3=image.spriteImages3;
         Map<String,List<BufferedImage>> spriteImage4=image.spriteImages4;
         players.add(new Player("An", 1, Color.RED, properties,spriteImage1));
-        players.add(new Player("Khoi", 1, Color.RED, properties,spriteImage1));
-        players.add(new Player("Khai", 1, Color.RED, properties,spriteImage1));
-        players.add(new Player("Hoan", 1, Color.RED, properties,spriteImage1));
-        MainBoard board = new MainBoard(properties, players);
+        // players.add(new Player("Khoi", 2, Color.RED, properties,spriteImage2));
+        // players.add(new Player("Khai", 3, Color.RED, properties,spriteImage3));
+        // players.add(new Player("Hoan", 4, Color.RED, properties,spriteImage4));
+        MainBoard board = MainBoard.getInstance(properties, players);
         board.setBounds(0, 0, 900, 760);
 
-        UIManager uiManager = new UIManager(null, null, null, properties, players, frame);
+        UIManager uiManager = new UIManager(properties, players, frame);
         GameManager gameManager = new GameManager(players, properties, uiManager, board, frame);
 
         // Truyền đúng diceLabel vào GamePanel

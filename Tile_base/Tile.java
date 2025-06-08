@@ -58,9 +58,9 @@ abstract class Tile {
 
     private void drawImage(Graphics2D g2, int width, int height) {
     if (img != null) {
-        int imgSize = 50;
-        int imgX = width/2 -imgSize;
-        int imgY = 25 + ((height - 25 - 40) / 2) - imgSize / 2; // Căn giữa phần còn lại
+        int imgSize = 40;
+        int imgX = width/2 -imgSize/2;
+        int imgY = height/2 - imgSize / 2; 
         g2.drawImage(img.getScaledInstance(imgSize, imgSize, Image.SCALE_SMOOTH), imgX, imgY, null);
     }
 }   

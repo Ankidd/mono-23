@@ -10,6 +10,15 @@ import javax.imageio.ImageIO;
 public class image {
     public static BufferedImage houseImg;
     public static BufferedImage festivalImg;
+    public static BufferedImage chanceIcon;
+    public static BufferedImage CommunityChestIcon;
+    public static BufferedImage StartPointImg;
+    public static BufferedImage PrisonPointImg;
+    public static BufferedImage visitPrisonImg;
+    public static BufferedImage ParkImg;
+    public static BufferedImage Taximg;
+    public static BufferedImage MonopolyImg;
+
 
     public static BufferedImage scaleFace1;
     public static BufferedImage scaleFace2;
@@ -30,6 +39,16 @@ public class image {
             // Load và scale ảnh nhà, lễ hội
             houseImg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "house.png")), 16, 16);
             festivalImg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "festival.png")), 50, 50);
+            chanceIcon = scaleImage(ImageIO.read(new File(PATH_IMAGE + "monopoly_chance_.png")), 50, 50);
+            CommunityChestIcon = scaleImage(ImageIO.read(new File(PATH_IMAGE + "monopoly_community_chest_.png")), 50, 50);
+            StartPointImg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "start_point_.png")), 50, 50);
+            PrisonPointImg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "monopoly_go_to_jail_point_.png")), 50, 50);
+            visitPrisonImg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "monopoly_prison_point_.png")), 50, 50);
+            ParkImg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "monopoly_free_parking_point_.png")), 50, 50);
+            Taximg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "monopoly_tax_ring_.png")), 50, 50);
+            MonopolyImg = scaleImage(ImageIO.read(new File(PATH_IMAGE + "icon1.png")), 50, 50);
+            
+            
 
             // Load và scale xúc xắc
             scaleFace1 = scaleImage(ImageIO.read(new File(PATH_IMAGE + "face1.png")), 50, 50);
@@ -153,5 +172,19 @@ public class image {
     // ✅ Trả về danh sách xúc xắc
     public static List<BufferedImage> diceList() {
         return Arrays.asList(scaleFace1, scaleFace2, scaleFace3, scaleFace4, scaleFace5, scaleFace6);
+    }
+
+    public static BufferedImage getScaledImage(BufferedImage original, int width, int height) {
+         BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resized.createGraphics();
+
+        // Chống mờ ảnh
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2d.drawImage(original, 0, 0, width, height, null);
+        g2d.dispose();
+        return resized;
     }
 }

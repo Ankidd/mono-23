@@ -3,12 +3,12 @@ package player;
 import java.awt.*;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import java.util.ArrayList;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.Map;
+import java.util.Random;
 
 import manager.GameManager;
 import manager.UIManager;
@@ -17,9 +17,10 @@ import Define.GameState;
 import Property.Property;
 import main.MainBoard;
 import main.GamePanel;
-import card.card;
+import observer.*;
 
-public class Player {
+public class Player implements Subject {
+    private List<Observer> observers;
     private int index;
     private String name;
     private int playerNumber;
@@ -28,7 +29,6 @@ public class Player {
     private boolean hasOutJailCard;
     private boolean inJail;
     private int jailTurnsLeft;
-    private boolean canRollAfterJail;
     private boolean bankruptcyStatus;
     private boolean is_moving;
 
@@ -41,13 +41,14 @@ public class Player {
     private int currentFrameIndex ;
     private Timer animationTimer;
     private Map<String,List<BufferedImage>> spriteImages;
+    private Random random;
 
     public Player(String name, int playerNumber, Color color, List<Property> properties,Map<String,List<BufferedImage>> spriteImages) {
         this.name = name;
         this.playerNumber = playerNumber;
         this.color = color;
-        this.index = 1;
-        this.money = 10000;
+        this.index = 0;
+        this.money = 100000;
         this.jailStatus = false;
         this.hasOutJailCard = false;
         this.jailTurnsLeft = 0;
@@ -59,9 +60,11 @@ public class Player {
         this.direction="up";
         this.currentFrameIndex=0;
         this.spriteImages = spriteImages;
+        observers= new ArrayList<>();
+        random=new Random();
     }
 
-    private void setPosition() {
+    public void setPosition() {
         Property prop = properties.get(index);
         if(index==0 ||index==7 ||index==21 ||index==28){
         this.x = prop.getX() + Define.BIG_TILE_SIZE / 2 ;
@@ -111,6 +114,11 @@ public class Player {
         ownedProperties.add(property);
         property.setOwner(this);
         property.setOwned(true);
+        notifyObservers();
+    }
+
+    public void removeProperty(Property property){
+        ownedProperties.remove(property);
     }
 
     public void addMoney(int amount) {
@@ -130,10 +138,25 @@ public class Player {
         }
     }
 
-    public void goToJail() {
-        this.jailStatus = true;
-        this.index = 10;
+    public void goToJail(MainBoard mainBoard) {
+        this.index = 7;
         setPosition();
+        mainBoard.repaint();
+        setJailStatus(true);
+        setInJail(true);
+        setJailTurnLeft(3);
+    }
+
+    public void goToStart(MainBoard mainBoard) {
+        this.index = 0;
+        setPosition();
+        mainBoard.repaint();
+    }
+
+    public void goToRandom(MainBoard mainBoard) {
+        this.index = random.nextInt(Property.createProperties().size());
+        setPosition();
+        mainBoard.repaint();
     }
 
 
@@ -156,8 +179,8 @@ public class Player {
                 } else {
                     ((Timer) e.getSource()).stop();
                     is_moving = false;
-                    gameManager.moveProcess();
                     gamePanel.setGameState(GameState.WAITING_FOR_PROPERTY_ACTION);
+                    gameManager.moveProcess();
                 }
             }
         });
@@ -205,10 +228,27 @@ public class Player {
     }
 
     private void updateDirection(int fromIndex, int toIndex) {
-    if (fromIndex>=28 && toIndex<=41) direction = "left"; 
-    else if(fromIndex>=0 && toIndex<=7) direction="up";
-    else if(fromIndex>=7 && toIndex<=21) direction="right";
-    else if(fromIndex>=21 && toIndex<=28) direction="down";
-}
+        if (fromIndex>=28 && toIndex<=41) direction = "left"; 
+        else if(fromIndex>=0 && toIndex<=7) direction="up";
+        else if(fromIndex>=7 && toIndex<=21) direction="right";
+        else if(fromIndex>=21 && toIndex<=28) direction="down";
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.handleWinCondition(this);
+        }
+    }
 
 }

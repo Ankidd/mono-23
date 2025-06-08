@@ -3,7 +3,6 @@ package main;
 import javax.swing.*;
 import java.util.List;
 import java.util.Map;
-import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -34,6 +33,10 @@ public class GamePanel extends JPanel implements Runnable {
     private JLabel diceLabel1 = new JLabel(); 
     private JLabel diceLabel2 = new JLabel(); 
     private JButton nextTurnButton;
+    private JButton ShowPlayerInformation;
+    private JButton ShowUnownedProperty;
+    private JButton ShowSellMenu;
+    private JButton ShowDialogTable;
 
 
     public GamePanel(List<Property> properties, List<Player> players, GameManager gameManager, UIManager uiManager,JLabel diceLabel1, JLabel diceLabel2) {
@@ -45,32 +48,62 @@ public class GamePanel extends JPanel implements Runnable {
         this.diceLabel2 = diceLabel2;
         this.nextTurnButton = new JButton("Next Turn");
         this.nextTurnButton.setEnabled(false);
-        nextTurnButton.setBounds(300, 600, 120, 40);
+        nextTurnButton.setBounds(Define.WIDTH/2+200, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-50, 120, 40);
+        this.ShowPlayerInformation = new JButton("Show player's information");
+        ShowPlayerInformation.setBounds(Define.WIDTH/2-300, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-50, 120, 40);
+         this.ShowUnownedProperty = new JButton("Show available property");
+        ShowUnownedProperty.setBounds(Define.WIDTH/2-500, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-50, 120, 40);
+        this.ShowSellMenu = new JButton("sell property");
+        ShowSellMenu.setBounds(Define.WIDTH/2+400, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-50, 120, 40);
+        this.ShowDialogTable = new JButton("show dialog");
+        ShowDialogTable.setBounds(Define.WIDTH/2- 60, Define.HEIGHT-Define.SMALL_TILE_SIZE_Y-50, 120, 40);
 
-        this.mainBoard = new MainBoard(properties, players);
+        this.mainBoard = MainBoard.getInstance();
         this.setLayout(null);
         mainBoard.setBounds(0,0,Define.WIDTH,Define.HEIGHT);
         this.add(nextTurnButton);
+        this.add(ShowSellMenu);
+        this.add(ShowDialogTable);
+        this.add(ShowPlayerInformation);
+        this.add(ShowUnownedProperty);
         this.add(mainBoard);
         this.addKeyListener(keyH);
         
         nextTurnButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Player currentPlayer = gameManager.getCurrentPlayer();
-                String name = currentPlayer.getName(); // nếu có getName()
-                JOptionPane.showMessageDialog(GamePanel.this,
-                        name + " đã kết thúc lượt.",
-                        "Thông báo",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-                gameManager.nextTurn();
-                setGameState(GameState.IDLE);         
-                nextTurnButton.setEnabled(false);
-
-                GamePanel.this.requestFocusInWindow();
+                gameManager.handleNextTurn(GamePanel.this, nextTurnButton);
             }
         });
+
+        ShowPlayerInformation.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                gameManager.handleShowPlayerInformation(GamePanel.this, ShowPlayerInformation);
+            }
+        });
+
+        ShowUnownedProperty.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                gameManager.handleShowUnownedProperties(GamePanel.this, ShowUnownedProperty);
+            }
+        });
+
+        ShowSellMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                uiManager.showSellPropertyMenu(gameManager.getCurrentPlayer());
+            }
+        });
+
+        ShowDialogTable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                gameManager.handleShowDialogTable(GamePanel.this);
+            }
+        });
+
         gameTimer = new Timer(20, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,26 +132,28 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (keyH.roll_button && gameState == GameState.IDLE) {
             keyH.roll_button = false;
+            gameState=GameState.ROLLING;
 
-            if (player.isInJail()) {
-                gameManager.prisonProcess();
-                System.out.println("in jail");
-            } else {
-                gameManager.rollProcess(diceLabel1, diceLabel2, this);
-            }
+            
+            gameManager.rollProcess(diceLabel1, diceLabel2, this);
         }
 
         if (gameState == GameState.WAITING_FOR_PROPERTY_ACTION) {
-            gameState = GameState.IDLE;
             nextTurnButton.setEnabled(true);
+            // gameState = GameState.IDLE;
         }
 
         if (keyH.exit) {
             System.exit(0);
         }
     }
-
-        public void setGameState(GameState state){
+    
+    public void setGameState(GameState state){
             gameState=state;
         }
+    
+    public GameState getGameState(){
+        return gameState;
+    }
+
     }
